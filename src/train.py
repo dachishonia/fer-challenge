@@ -7,7 +7,7 @@ from dataset import EMOTION_LABELS
 from utils import log_confusion_matrix, log_sample_predictions, log_grad_flow
 
 WANDB_PROJECT = "fer-challenge"
-WANDB_ENTITY  = "dshon23"
+WANDB_ENTITY  = "dshon23-free-university-of-tbilisi"
 
 
 # ── Epoch helpers ─────────────────────────────────────────────────────────────
