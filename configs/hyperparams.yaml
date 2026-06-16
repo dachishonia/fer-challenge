@@ -1,0 +1,158 @@
+# Hyperparameter configurations for all FER experiments
+# Each architecture has multiple runs to test different hyperparameters.
+
+experiments:
+
+  # ── v1: TinyCNN ────────────────────────────────────────────────────────────
+  # Purpose: Establish underfitting baseline. Too small for 7-class problem.
+  - run_name: "tiny_cnn_v1_adam_lr1e3"
+    architecture: tiny_cnn
+    epochs: 40
+    lr: 0.001
+    optimizer: adam
+    scheduler: plateau
+    batch_size: 64
+    dropout: 0.0
+    augment: false
+    weight_decay: 0.0
+    for_transfer: false
+
+  - run_name: "tiny_cnn_v2_adam_lr1e2"
+    architecture: tiny_cnn
+    epochs: 40
+    lr: 0.01
+    optimizer: adam
+    scheduler: plateau
+    batch_size: 64
+    dropout: 0.0
+    augment: false
+    weight_decay: 0.0
+    for_transfer: false
+
+  - run_name: "tiny_cnn_v3_sgd"
+    architecture: tiny_cnn
+    epochs: 40
+    lr: 0.01
+    optimizer: sgd
+    scheduler: step
+    batch_size: 64
+    dropout: 0.0
+    augment: false
+    weight_decay: 1.0e-4
+    for_transfer: false
+
+  # ── v2: SmallCNN ───────────────────────────────────────────────────────────
+  # Purpose: More capacity but no regularization → expect overfitting.
+  - run_name: "small_cnn_v1_no_reg"
+    architecture: small_cnn
+    epochs: 60
+    lr: 0.001
+    optimizer: adam
+    scheduler: plateau
+    batch_size: 64
+    dropout: 0.0
+    augment: false
+    weight_decay: 0.0
+    for_transfer: false
+
+  - run_name: "small_cnn_v2_dropout"
+    architecture: small_cnn
+    epochs: 60
+    lr: 0.001
+    optimizer: adam
+    scheduler: plateau
+    batch_size: 64
+    dropout: 0.3
+    augment: true
+    weight_decay: 1.0e-4
+    for_transfer: false
+
+  # ── v3: MediumCNN ──────────────────────────────────────────────────────────
+  # Purpose: BatchNorm + Dropout regularization. Test two dropout strengths.
+  - run_name: "medium_cnn_v1_dropout03"
+    architecture: medium_cnn
+    epochs: 60
+    lr: 0.001
+    optimizer: adam
+    scheduler: plateau
+    batch_size: 64
+    dropout: 0.3
+    augment: true
+    weight_decay: 1.0e-4
+    for_transfer: false
+
+  - run_name: "medium_cnn_v2_dropout05"
+    architecture: medium_cnn
+    epochs: 60
+    lr: 0.001
+    optimizer: adam
+    scheduler: plateau
+    batch_size: 64
+    dropout: 0.5
+    augment: true
+    weight_decay: 1.0e-4
+    for_transfer: false
+
+  - run_name: "medium_cnn_v3_cosine"
+    architecture: medium_cnn
+    epochs: 60
+    lr: 0.001
+    optimizer: adam
+    scheduler: cosine
+    batch_size: 32
+    dropout: 0.4
+    augment: true
+    weight_decay: 5.0e-4
+    for_transfer: false
+
+  # ── v4: ResNetStyleCNN ─────────────────────────────────────────────────────
+  # Purpose: Residual connections for better gradient flow in deep network.
+  - run_name: "resnet_style_v1_plateau"
+    architecture: resnet_style
+    epochs: 60
+    lr: 0.001
+    optimizer: adam
+    scheduler: plateau
+    batch_size: 64
+    dropout: 0.4
+    augment: true
+    weight_decay: 1.0e-4
+    for_transfer: false
+
+  - run_name: "resnet_style_v2_cosine"
+    architecture: resnet_style
+    epochs: 60
+    lr: 0.001
+    optimizer: adam
+    scheduler: cosine
+    batch_size: 64
+    dropout: 0.4
+    augment: true
+    weight_decay: 1.0e-4
+    for_transfer: false
+
+  # ── v5: Transfer Learning ──────────────────────────────────────────────────
+  # Purpose: ImageNet pretrained features for best accuracy.
+  - run_name: "transfer_mobilenet_v1_frozen"
+    architecture: transfer_learning
+    epochs: 30
+    lr: 0.0003
+    optimizer: adam
+    scheduler: plateau
+    batch_size: 32
+    dropout: 0.5
+    augment: true
+    weight_decay: 1.0e-4
+    for_transfer: true
+
+  - run_name: "transfer_mobilenet_v2_finetune"
+    architecture: transfer_learning
+    epochs: 30
+    lr: 0.0001
+    optimizer: adam
+    scheduler: cosine
+    batch_size: 32
+    dropout: 0.3
+    augment: true
+    weight_decay: 5.0e-5
+    for_transfer: true
