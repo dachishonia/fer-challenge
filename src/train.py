@@ -59,10 +59,10 @@ def evaluate(model, loader, criterion, device, return_preds=False):
                 sample_imgs = (images[:16].cpu(), labels[:16].cpu().tolist(), preds[:16].cpu().tolist())
                 collected_sample = True
 
-if total == 0:
-        if return_preds:
-            return 0.0, 0.0, [], [], []
-        return 0.0, 0.0
+    if total == 0:
+            if return_preds:
+                return 0.0, 0.0, [], [], []
+            return 0.0, 0.0
     return total_loss / total, correct / total
 
 
