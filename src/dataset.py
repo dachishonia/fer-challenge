@@ -77,11 +77,39 @@ def get_transforms(augment=True, for_transfer=False):
 
 
 def get_dataloaders(csv_path, batch_size=64, augment=True, for_transfer=False, num_workers=2):
+    import numpy as np
+    from sklearn.model_selection import train_test_split
+
     df = pd.read_csv(csv_path)
 
-    train_df = df[df['Usage'] == 'Training'].reset_index(drop=True)
-    val_df = df[df['Usage'] == 'PublicTest'].reset_index(drop=True)
-    test_df = df[df['Usage'] == 'PrivateTest'].reset_index(drop=True)
+    # emotion -> int; drop stray non-numeric rows (e.g. an 'ing' fragment)
+    df['emotion'] = pd.to_numeric(df['emotion'], errors='coerce')
+    df = df.dropna(subset=['emotion', 'pixels'])
+    df['emotion'] = df['emotion'].astype(int)
+
+    # drop malformed pixel rows so reshape(48,48) can never crash mid-training
+    df = df[df['pixels'].str.split().str.len() == 2304].reset_index(drop=True)
+
+    # normalize Usage; if it's missing or collapsed to one split, build our own
+    valid = ['Training', 'PublicTest', 'PrivateTest']
+    has_usage = ('Usage' in df.columns and
+                 df['Usage'].astype(str).str.strip().isin(valid).any())
+    if has_usage:
+        df['Usage'] = df['Usage'].astype(str).str.strip()
+        train_df = df[df['Usage'] == 'Training'].reset_index(drop=True)
+        val_df   = df[df['Usage'] == 'PublicTest'].reset_index(drop=True)
+        test_df  = df[df['Usage'] == 'PrivateTest'].reset_index(drop=True)
+        if len(val_df) == 0 or len(test_df) == 0:
+            has_usage = False
+    if not has_usage:
+        train_df, tmp = train_test_split(df, test_size=0.2, random_state=42,
+                                         stratify=df['emotion'])
+        val_df, test_df = train_test_split(tmp, test_size=0.5, random_state=42,
+                                           stratify=tmp['emotion'])
+        train_df, val_df, test_df = (x.reset_index(drop=True)
+                                     for x in (train_df, val_df, test_df))
+
+    assert len(val_df) > 0, "Validation set is empty — check the CSV's Usage column / row count"
 
     train_t, val_t = get_transforms(augment=augment, for_transfer=for_transfer)
 
